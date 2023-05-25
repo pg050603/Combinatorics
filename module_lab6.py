@@ -4,43 +4,148 @@ import numpy as np
 
 def interpolate_linear(ti, yi, tj, default=None):
     """
+    performs linear interpolation of sampled data to a desired set of measurement points
+
+    Arugments:
+    ----------
+    ti 1D array: Measurement points ti of sampled data
+    yi 1D array: Measurement values y(ti) of the sampled data
+    tj 1D array: Measurement points, tj , of the desired linearly interpolated data
+    default None or other: Optional arguement, default value none, value is set for the measurement value, y(tj), when the measurement point is outside the sampled data
+
+    Returns:
+    -------
+    yj 1D array: Measurement values y(tj) for the linearly interpolated data
     TODO
     """
-    pass
+
+    #Initalise interval list
+    interval_t = []
+    interval_y = []
+
+    #Get list of all subintervals for t and y
+    for i in range(len(ti) - 1):
+        sub_t = [ti[i], ti[i+1]]
+        sub_y = [yi[i], yi[i+1]]
+        interval_t.append(sub_t)
+        interval_y.append(sub_y)
+
+    for j in range(len(tj)):
+        for k in range(len(interval_t)):
+            if interval_t[k][0] < tj[j] < interval_t[k][1]:
+                print(interval_t[k])
+                print(tj[j])
+                print(interval_y[k])
+    return
 
 
 def integrate_composite_trapezoid(tj, yj):
     """
+    Uses the Newton-Cotes composite trapezoid rule to integrate: y(t) over the interval t0 to tn-1
+
+    Arguements:
+    ----------
+    tj 1D array: Measurement points, tj. Assumes closed interval (first and last points are integral limits)
+    yj 1D array: Measurement values, y(tj), of the integrand
+
+    Returns:
+    -------
+    integral float: Numerical approximation of integral
     TODO
     """
-    pass
+
+    #Set a to t0 and b to tn-1
+    a = tj[0]
+    b = tj[-1]
+
+    #Calculate the step size between points h
+    h = b - a
+
+    #Use 'Trapezoid Rule' to solve integral
+    integral = h/2 * (yj[0] + yj[-1])
+
+    return integral
 
 
 def spath_initialise(network, source_name):
     """
+    Sets the initial distance and predecessor node for each node
+
+    Arguments:
+    ----------
+    network object: An object belonging to the network class
+    source_name str: Name of the source node
+
+    Returns:
+    --------
+    unvisited set: A set containing the names of all nodes in the network
     TODO
     """
+
+
+
+
+
+
     pass
 
 
 def spath_iteration(network, unvisited):
     """
+    Performs one iteration of the shortestpath algorithm
+
+    Arguments:
+    ---------
+    network object: An object that belongs to the network class
+    unvisited set: Set with the names of all currently unsolved nodes in the network
+
+    Returns:
+    -------
+    solved name str or None: Name of the node that was solved on the current iteration
     TODO
     """
+
     pass
 
 
 def spath_extract_path(network, destination_name):
     """
+    Uses chain of predecessors nodes to generate a list of node names for the shortest path
+
+    Arguments:
+    ----------
+    network object: An object that belongs to the network class
+    destination_name str: Name of the destination node
+
+    Returns:
+    --------
+    path list: List of node names in shortest path, inclusive of start and end
+
     TODO
     """
+
+
     pass
 
 
 def spath_algorithm(network, source_name, destination_name):
     """
+    Uses Dijkstra’s shortest-path algorithm to find shortest path
+
+    Arguments:
+    ----------
+    network object: An object that belongs to the network class
+    source_name str: Name of the source node
+    destination_name str: Name of the destination node
+
+    Returns:
+    --------
+    distance float: The distance (accumulated arc weight) of shortest path, if no solution, return None
+    path list: List of node names in shortest path, inclusive of start and end, if no solution, return None
     TODO
     """
+
+
     pass
 
 
