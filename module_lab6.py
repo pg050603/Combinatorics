@@ -19,24 +19,30 @@ def interpolate_linear(ti, yi, tj, default=None):
     TODO
     """
 
-    #Initalise interval list
+    # Initalise interval list
     interval_t = []
     interval_y = []
+    yj = []
 
-    #Get list of all subintervals for t and y
+    # Get list of all subintervals for t and y
     for i in range(len(ti) - 1):
-        sub_t = [ti[i], ti[i+1]]
-        sub_y = [yi[i], yi[i+1]]
+        sub_t = [ti[i], ti[i + 1]]
+        sub_y = [yi[i], yi[i + 1]]
         interval_t.append(sub_t)
         interval_y.append(sub_y)
 
+    # For each Measurement point, identify if it is in a subinterval
+    # Use subintervals parameters (t and y bounds) to calculate fi(tj)
     for j in range(len(tj)):
         for k in range(len(interval_t)):
             if interval_t[k][0] < tj[j] < interval_t[k][1]:
-                print(interval_t[k])
-                print(tj[j])
-                print(interval_y[k])
-    return
+                fi_tj = interval_y[k][0] + (
+                            (interval_y[k][1] - interval_y[k][0]) / (interval_t[k][1] - interval_t[k][0])) * (
+                                    tj[j] - interval_t[k][0])
+                yj.append(fi_tj)
+    yj = np.array(yj)
+
+    return yj
 
 
 def integrate_composite_trapezoid(tj, yj):
@@ -54,15 +60,15 @@ def integrate_composite_trapezoid(tj, yj):
     TODO
     """
 
-    #Set a to t0 and b to tn-1
+    # Set a = t0 and b = tn-1
     a = tj[0]
     b = tj[-1]
 
-    #Calculate the step size between points h
+    # Calculate the step size between points h
     h = b - a
 
-    #Use 'Trapezoid Rule' to solve integral
-    integral = h/2 * (yj[0] + yj[-1])
+    # Use 'Trapezoid Rule' to solve integral
+    integral = h / 2 * (yj[0] + yj[-1])
 
     return integral
 
@@ -81,9 +87,6 @@ def spath_initialise(network, source_name):
     unvisited set: A set containing the names of all nodes in the network
     TODO
     """
-
-
-
 
 
 
@@ -124,7 +127,6 @@ def spath_extract_path(network, destination_name):
     TODO
     """
 
-
     pass
 
 
@@ -145,7 +147,6 @@ def spath_algorithm(network, source_name, destination_name):
     TODO
     """
 
-
     pass
 
 
@@ -164,6 +165,7 @@ class Node(object):
     arcs_out : list
         Arc objects that begin at this node.
     """
+
     def __init__(self, name=None, value=None, arcs_in=None, arcs_out=None):
 
         self.name = name
@@ -190,6 +192,7 @@ class Arc(object):
     from_node : Node
         Node object at which arc begins.
     """
+
     def __init__(self, weight=None, from_node=None, to_node=None):
         self.weight = weight
         self.from_node = from_node
@@ -210,6 +213,7 @@ class Network(object):
     arcs : list
         A list of all Arc (defined above) objects in the network.
     """
+
     def __init__(self, nodes=None, arcs=None):
         if nodes is None:
             self.nodes = []
