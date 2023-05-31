@@ -37,14 +37,13 @@ for i in range(len(yj_iw1)):
 Year = list(cmc_tj_map.keys())
 Cumulative_mass_change = list(cmc_tj_map.values())
 
-#Create figure
-plt.figure(figsize=(5,2.7), layout = 'constrained')
-#Plot the cumulative net mass change against year
+# Create figure
+plt.figure(figsize=(5, 2.7), layout='constrained')
+# Plot the cumulative net mass change against year
 plt.plot(Year, Cumulative_mass_change, label='Cumulative Net Mass Change')
-#Axis lables, title, and legend
+# Axis labels, title, and legend
 plt.xlabel('Year')
 plt.ylabel('Cumulative Net Mass Change (kg)')
 plt.title("Yearly Cumulative Net Mass Change (1980 - 2014.5)")
 
 plt.show()
-
