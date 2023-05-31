@@ -8,7 +8,10 @@ tj = np.arange(1980, 2015, 0.5)
 
 # TODO - your code here
 
-yj = interpolate_linear(ti_iw1, yi_iw1, tj, default=None)
-print(yj)
+yj_iw1, tj_interpolated_iw1 = interpolate_linear(ti_iw1, yi_iw1, tj, default=0)
 
-[1980.4583, 1980.5417]
+# yj_pw1 = interpolate_linear(ti_pw1, yi_pw1, tj, default=None)
+# yj_pw2 = interpolate_linear(ti_pw2, yi_pw2, tj, default=None)
+
+# print(yj_iw1)
+# print(tj_interpolated_iw1)

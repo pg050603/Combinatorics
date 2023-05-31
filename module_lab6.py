@@ -1,17 +1,17 @@
 # imports
 import numpy as np
 
-
 def interpolate_linear(ti, yi, tj, default=None):
     """
-    performs linear interpolation of sampled data to a desired set of measurement points
+    Linear interpolation on sampled data to a desired set of measurement points
 
-    Arugments:
+    Arguments:
     ----------
     ti 1D array: Measurement points ti of sampled data
     yi 1D array: Measurement values y(ti) of the sampled data
     tj 1D array: Measurement points, tj , of the desired linearly interpolated data
-    default None or other: Optional arguement, default value none, value is set for the measurement value, y(tj), when the measurement point is outside the sampled data
+    default None or other: Optional argument, default value none, value is set for the measurement value, y(tj), when the measurement
+    point is outside the sampled data
 
     Returns:
     -------
@@ -19,30 +19,47 @@ def interpolate_linear(ti, yi, tj, default=None):
     TODO
     """
 
-    # Initalise interval list
+    # Initialise interval list
     interval_t = []
     interval_y = []
     yj = []
+    tj_interpolated = []
 
-    # Get list of all subintervals for t and y
+    # Get list of all sub-intervals for t and y
     for i in range(len(ti) - 1):
         sub_t = [ti[i], ti[i + 1]]
         sub_y = [yi[i], yi[i + 1]]
         interval_t.append(sub_t)
         interval_y.append(sub_y)
 
-    # For each Measurement point, identify if it is in a subinterval
-    # Use subintervals parameters (t and y bounds) to calculate fi(tj)
+    # print(interval_t)
+    # print(interval_y)
+
+
+
+    yj_tj_map = {}
+
+    # For each Measurement point, identify if it is in a sub-interval
+    # Use sub-intervals parameters (t and y bounds) to calculate fi(tj)
     for j in range(len(tj)):
         for k in range(len(interval_t)):
-            if interval_t[k][0] < tj[j] < interval_t[k][1]:
-                fi_tj = interval_y[k][0] + (
-                            (interval_y[k][1] - interval_y[k][0]) / (interval_t[k][1] - interval_t[k][0])) * (
-                                    tj[j] - interval_t[k][0])
-                yj.append(fi_tj)
-    yj = np.array(yj)
+            if interval_t[k][0] <= tj[j] <= interval_t[k][1]:
+                fi_tj = interval_y[k][0] + (tj[j] - interval_t[k][0])*(interval_y[k][1] - interval_y[k][0])/(interval_t[k][1] - interval_t[k][0])
+                yj_tj_map[tj[j]] = fi_tj
+            elif tj[j] not in yj_tj_map:
+                yj_tj_map[tj[j]] = default
 
-    return yj
+    #WORKS WITH NO DUPLICATES OF SUBINTERVALA CROSS OVER
+    print(yj_tj_map)
+
+    #Get list for tj, get list for yj
+    years = yj_tj_map.keys()
+    injection_rate = yj_tj_map.values()
+
+    print(years)
+    print(injection_rate)
+
+    return yj, tj_interpolated
 
 
 def integrate_composite_trapezoid(tj, yj):
@@ -329,3 +346,4 @@ class Network(object):
 
                 # get next line in file
                 line = file.readline()
+`
