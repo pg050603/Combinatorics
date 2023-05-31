@@ -1,5 +1,6 @@
 # imports
 import numpy as np
+import matplotlib.pyplot as plt
 
 def interpolate_linear(ti, yi, tj, default=None):
     """
@@ -13,17 +14,14 @@ def interpolate_linear(ti, yi, tj, default=None):
     default None or other: Optional argument, default value none, value is set for the measurement value, y(tj), when the measurement
     point is outside the sampled data
 
-    Returns:
-    -------
+     -------
     yj 1D array: Measurement values y(tj) for the linearly interpolated data
     TODO
     """
 
-    # Initialise interval list
+    # Initialise interval lists
     interval_t = []
     interval_y = []
-    yj = []
-    tj_interpolated = []
 
     # Get list of all sub-intervals for t and y
     for i in range(len(ti) - 1):
@@ -32,11 +30,7 @@ def interpolate_linear(ti, yi, tj, default=None):
         interval_t.append(sub_t)
         interval_y.append(sub_y)
 
-    # print(interval_t)
-    # print(interval_y)
-
-
-
+    # Initialise dictionary mapping for mass change and time
     yj_tj_map = {}
 
     # For each Measurement point, identify if it is in a sub-interval
@@ -44,22 +38,17 @@ def interpolate_linear(ti, yi, tj, default=None):
     for j in range(len(tj)):
         for k in range(len(interval_t)):
             if interval_t[k][0] <= tj[j] <= interval_t[k][1]:
-                fi_tj = interval_y[k][0] + (tj[j] - interval_t[k][0])*(interval_y[k][1] - interval_y[k][0])/(interval_t[k][1] - interval_t[k][0])
+                fi_tj = interval_y[k][0] + (tj[j] - interval_t[k][0]) * (interval_y[k][1] - interval_y[k][0]) / (
+                        interval_t[k][1] - interval_t[k][0])
                 yj_tj_map[tj[j]] = fi_tj
             elif tj[j] not in yj_tj_map:
                 yj_tj_map[tj[j]] = default
 
-    #WORKS WITH NO DUPLICATES OF SUBINTERVALA CROSS OVER
-    print(yj_tj_map)
-
-    #Get list for tj, get list for yj
-    years = yj_tj_map.keys()
-    injection_rate = yj_tj_map.values()
-
-    print(years)
-    print(injection_rate)
-
-    return yj, tj_interpolated
+    # Get 1D array for times and injection rates
+    tj = np.array(list(yj_tj_map.keys()))
+    injection_rate = list(yj_tj_map.values())
+    yj = np.array(injection_rate)
+    return yj
 
 
 def integrate_composite_trapezoid(tj, yj):
@@ -76,19 +65,15 @@ def integrate_composite_trapezoid(tj, yj):
     integral float: Numerical approximation of integral
     TODO
     """
+    # Initialise the approximation value of integral as 0
+    integral = 0
 
-    # Set a = t0 and b = tn-1
-    a = tj[0]
-    b = tj[-1]
-
-    # Calculate the step size between points h
-    h = b - a
-
-    # Use 'Trapezoid Rule' to solve integral
-    integral = h / 2 * (yj[0] + yj[-1])
+    # Get the integral areas (I) for each of the sub-intervals in the ith timespan within tj
+    for i in range(len(tj) - 1):
+        I_i = ((tj[i + 1] - tj[i]) / 2) * (yj[i] + yj[i + 1])
+        integral = integral + I_i
 
     return integral
-
 
 def spath_initialise(network, source_name):
     """
@@ -104,8 +89,6 @@ def spath_initialise(network, source_name):
     unvisited set: A set containing the names of all nodes in the network
     TODO
     """
-
-
 
     pass
 
@@ -346,4 +329,3 @@ class Network(object):
 
                 # get next line in file
                 line = file.readline()
-`

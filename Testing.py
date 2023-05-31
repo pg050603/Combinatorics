@@ -1,7 +1,5 @@
-# Create 2 independent lists
+for i in range(len([1,2,3]) - 1):
+    print(i)
 
 
-
-int_list = []
-int_list.append(4.0001)
-print(int_list)
+# print(len([1,2,3]))
