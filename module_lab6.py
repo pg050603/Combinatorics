@@ -1,9 +1,7 @@
 # imports
-import collections
-
 import numpy as np
 import matplotlib.pyplot as plt
-from collections import defaultdict
+
 
 def interpolate_linear(ti, yi, tj, default=None):
     """
@@ -14,8 +12,8 @@ def interpolate_linear(ti, yi, tj, default=None):
     ti 1D array: Measurement points ti of sampled data
     yi 1D array: Measurement values y(ti) of the sampled data
     tj 1D array: Measurement points, tj , of the desired linearly interpolated data
-    default None or other: Optional argument, default value none, value is set for the measurement value, y(tj), when the measurement
-    point is outside the sampled data
+    default None or other: Optional argument, default value none, value is set for the measurement value, y(tj),
+    when the measurement point is outside the sampled data
 
      -------
     yj 1D array: Measurement values y(tj) for the linearly interpolated data
@@ -58,7 +56,7 @@ def integrate_composite_trapezoid(tj, yj):
     """
     Uses the Newton-Cotes composite trapezoid rule to integrate: y(t) over the interval t0 to tn-1
 
-    Arguements:
+    Arguments:
     ----------
     tj 1D array: Measurement points, tj. Assumes closed interval (first and last points are integral limits)
     yj 1D array: Measurement values, y(tj), of the integrand
@@ -78,6 +76,7 @@ def integrate_composite_trapezoid(tj, yj):
 
     return integral
 
+
 def spath_initialise(network, source_name):
     """
     Sets the initial distance and predecessor node for each node
@@ -93,18 +92,15 @@ def spath_initialise(network, source_name):
     TODO
     """
 
-    #Initalise the dict mapping
+    # Initialise the dict mapping
     unvisited = set()
 
-    # Add all nodes in the network to unvisted, initalise distance as infinity and predecessor as None
+    # Add all nodes in the network to unlisted, initialise distance as infinity and predecessor as None
     for node in network.nodes:
         node.value = [np.inf, None]
         unvisited.add(node.name)
     # For the source node, set distance as 0
     network.get_node(source_name).value = [0, None]
-
-
-
 
     return unvisited
 
@@ -123,11 +119,12 @@ def spath_iteration(network, unvisited):
     solved name str or None: Name of the node that was solved on the current iteration
     TODO
     """
+
     def get_distance(name):
         node = network.get_node(name)
         return node.value[0]
 
-    interation_name = min(unvisited, key = get_distance)
+    interation_name = min(unvisited, key=get_distance)
 
     # Remove node from unvisited set
     unvisited.remove(interation_name)
@@ -148,6 +145,7 @@ def spath_iteration(network, unvisited):
 
     return interation_name
 
+
 def spath_extract_path(network, destination_name):
     """
     Uses chain of predecessors nodes to generate a list of node names for the shortest path
@@ -166,15 +164,14 @@ def spath_extract_path(network, destination_name):
 
     current_node = network.get_node(destination_name)
 
-
     predecessor_node = current_node.value[1]
 
-    if predecessor_node == None:
+    if predecessor_node is None:
         return [destination_name]
 
     predecessor_name = current_node.value[1].name
 
-    path = spath_extract_path(network,predecessor_name)
+    path = spath_extract_path(network, predecessor_name)
 
     path.append(destination_name)
 
@@ -201,8 +198,6 @@ def spath_algorithm(network, source_name, destination_name):
 
     while unvisited:
         spath_iteration(network, unvisited)
-
-
 
     path_unchecked = spath_extract_path(network, destination_name)
     distance_unchecked = network.get_node(path_unchecked[-1]).value[0]

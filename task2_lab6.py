@@ -3,8 +3,8 @@ from module_lab6 import *
 network = Network()
 network.read_network('network_waka_voyage.txt')
 
-source_name = 'Taiwan'
-destination_name = 'Hokianga'
+source_name = 'Sorong'
+destination_name = 'Brisbane'
 
 distance, path = spath_algorithm(network, source_name, destination_name)
 
