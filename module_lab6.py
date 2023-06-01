@@ -202,9 +202,17 @@ def spath_algorithm(network, source_name, destination_name):
     while unvisited:
         spath_iteration(network, unvisited)
 
-    path = spath_extract_path(network, destination_name)
-    distance = network.get_node(path[-1]).value[0]
 
+
+    path_unchecked = spath_extract_path(network, destination_name)
+    distance_unchecked = network.get_node(path_unchecked[-1]).value[0]
+
+    if distance_unchecked == np.inf:
+        path = None
+        distance = None
+    else:
+        path = path_unchecked
+        distance = distance_unchecked
     return distance, path
 
 
