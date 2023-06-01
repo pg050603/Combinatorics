@@ -1,6 +1,9 @@
 # imports
+import collections
+
 import numpy as np
 import matplotlib.pyplot as plt
+from collections import defaultdict
 
 def interpolate_linear(ti, yi, tj, default=None):
     """
@@ -90,12 +93,25 @@ def spath_initialise(network, source_name):
     TODO
     """
 
-    pass
+    #Initalise the dict mapping
+    unvisited = set()
+
+    # Add all nodes in the network to unvisted, initalise distance as infinity and predecessor as None
+    for node in network.nodes:
+        node.value = [np.inf, None]
+        unvisited.add(node.name)
+    # For the source node, set distance as 0
+    network.get_node(source_name).value = [0, None]
+
+
+
+
+    return unvisited
 
 
 def spath_iteration(network, unvisited):
     """
-    Performs one iteration of the shortestpath algorithm
+    Performs one iteration of the shortest path algorithm
 
     Arguments:
     ---------
@@ -107,9 +123,30 @@ def spath_iteration(network, unvisited):
     solved name str or None: Name of the node that was solved on the current iteration
     TODO
     """
+    def get_distance(name):
+        node = network.get_node(name)
+        return node.value[0]
 
-    pass
+    interation_name = min(unvisited, key = get_distance)
 
+    # Remove node from unvisited set
+    unvisited.remove(interation_name)
+
+    def get_name(arc):
+        return arc.from_node.name == interation_name
+
+    # Returns list of all neighbours_arcs
+    neighbours_arcs = filter(get_name, network.arcs)
+    current_node = network.get_node(interation_name)
+
+    for arc in neighbours_arcs:
+        new_distance = arc.weight + current_node.value[0]
+        neighbour = arc.to_node
+        if neighbour.value[0] > new_distance:
+            neighbour.value[0] = new_distance
+            neighbour.value[1] = current_node
+
+    return interation_name
 
 def spath_extract_path(network, destination_name):
     """
@@ -127,7 +164,21 @@ def spath_extract_path(network, destination_name):
     TODO
     """
 
-    pass
+    current_node = network.get_node(destination_name)
+
+
+    predecessor_node = current_node.value[1]
+
+    if predecessor_node == None:
+        return [destination_name]
+
+    predecessor_name = current_node.value[1].name
+
+    path = spath_extract_path(network,predecessor_name)
+
+    path.append(destination_name)
+
+    return path
 
 
 def spath_algorithm(network, source_name, destination_name):
@@ -146,8 +197,15 @@ def spath_algorithm(network, source_name, destination_name):
     path list: List of node names in shortest path, inclusive of start and end, if no solution, return None
     TODO
     """
+    unvisited = spath_initialise(network, source_name)
 
-    pass
+    while unvisited:
+        spath_iteration(network, unvisited)
+
+    path = spath_extract_path(network, destination_name)
+    distance = network.get_node(path[-1]).value[0]
+
+    return distance, path
 
 
 class Node(object):
