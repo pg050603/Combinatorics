@@ -3,31 +3,31 @@ network = Network()
 network.read_network('network_waka_voyage.txt')
 # TODO - your code here
 
-# source_name = 'Taiwan'
-# destination_name = 'Hokianga'
+source_name = 'Hokianga'
+destination_name = 'Taiwan'
+
+a,b = spath_algorithm(network, source_name, destination_name)
+
+print(a)
+print(b)
+
+# mapping = {}
+# for node in network.nodes:
+#     source_name = network.get_node(node.name).name
+#     for node in network.nodes:
+#         destination_name = network.get_node(node.name).name
+#         distance, path = spath_algorithm(network, source_name, destination_name)
+#         #Figure out how to have condition to check if key exists
+#         if key exists:
+#             mapping[distance].append(path)
+#         else:
+#             mapping[distance] = [path]
 #
-# a,b = spath_algorithm(network, source_name, destination_name)
+# del mapping[None]
 #
-# print(a)
-# print(b)
-
-mapping = {}
-for node in network.nodes:
-    source_name = network.get_node(node.name).name
-    for node in network.nodes:
-        destination_name = network.get_node(node.name).name
-        distance, path = spath_algorithm(network, source_name, destination_name)
-        #Figure out how to have condition to check if key exists
-        if key exists:
-            mapping[distance].append(path)
-        else:
-            mapping[distance] = [path]
-
-del mapping[None]
-
-max_value = mapping[max(mapping)]
-
-print(max_value)
+# max_value = mapping[max(mapping)]
+#
+# print(max_value)
 
 
 # filtered_distances = filter(lambda item: item is not None, distances)

@@ -212,7 +212,6 @@ def spath_algorithm(network, source_name, destination_name):
 
     # While there are still unvisitied nodes perform iterations of Dijkstra Algorithm
     while unvisited:
-
         spath_iteration(network, unvisited)
 
     # Return unchecked list of node names in path
