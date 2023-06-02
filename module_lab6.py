@@ -20,22 +20,23 @@ def interpolate_linear(ti, yi, tj, default=None):
     TODO
     """
 
-    # Initialise interval lists
+    # Initialise empty lists for intervals
     interval_t = []
     interval_y = []
 
-    # Get list of all sub-intervals for t and y
+    # Create sub-intervals with ti and yi, append to relevant list to get all sub-intervals
     for i in range(len(ti) - 1):
         sub_t = [ti[i], ti[i + 1]]
         sub_y = [yi[i], yi[i + 1]]
         interval_t.append(sub_t)
         interval_y.append(sub_y)
 
-    # Initialise dictionary mapping for mass change and time
+    # Dictionary mapping for mass change and time
     yj_tj_map = {}
 
-    # For each Measurement point, identify if it is in a sub-interval
-    # Use sub-intervals parameters (t and y bounds) to calculate fi(tj)
+    # For each Measurement point, identify what sub-interval it is within if any
+    # Use sub-intervals parameters (ti and yi bounds) to calculate yj = fi(tj)
+    # Map fi(tj) to corresponding tj in dictionary, if tj is not in a sub-interval map the default value to tj
     for j in range(len(tj)):
         for k in range(len(interval_t)):
             if interval_t[k][0] <= tj[j] <= interval_t[k][1]:
@@ -47,8 +48,7 @@ def interpolate_linear(ti, yi, tj, default=None):
 
     # Get 1D array for times and injection rates
     tj = np.array(list(yj_tj_map.keys()))
-    injection_rate = list(yj_tj_map.values())
-    yj = np.array(injection_rate)
+    yj = np.array(list(yj_tj_map.values()))
     return yj
 
 
@@ -69,13 +69,12 @@ def integrate_composite_trapezoid(tj, yj):
     # Initialise the approximation value of integral as 0
     integral = 0
 
-    # Get the integral areas (I) for each of the sub-intervals in the ith timespan within tj
+    # Get the integral area (I_i) for all sub-intervals in the ith timespan within tj
     for i in range(len(tj) - 1):
         I_i = ((tj[i + 1] - tj[i]) / 2) * (yj[i] + yj[i + 1])
         integral = integral + I_i
 
     return integral
-
 
 def spath_initialise(network, source_name):
     """
@@ -92,14 +91,16 @@ def spath_initialise(network, source_name):
     TODO
     """
 
-    # Initialise the dict mapping
+    # Initialise the set for unvisited nodes
     unvisited = set()
 
-    # Add all nodes in the network to unlisted, initialise distance as infinity and predecessor as None
+    # Add all nodes in the network to unvisited
+    # Value is a list of distance and predecessor. Initialise distance as infinity and predecessor as None
     for node in network.nodes:
         node.value = [np.inf, None]
         unvisited.add(node.name)
-    # For the source node, set distance as 0
+
+    # For the source node, set distance as 0 and predecessor as None
     network.get_node(source_name).value = [0, None]
 
     return unvisited
@@ -120,31 +121,37 @@ def spath_iteration(network, unvisited):
     TODO
     """
 
+    # Helper function: Returns the distance value of a node with specified name
     def get_distance(name):
         node = network.get_node(name)
         return node.value[0]
 
+    # Return the node in unvisited with the minimum distance
     interation_name = min(unvisited, key=get_distance)
 
-    # Remove node from unvisited set
+    # Remove minimum node from unvisited set
     unvisited.remove(interation_name)
 
+    # Helper function: Returns true if the node name of arc element from_node (predecessor) is name of minimum
     def get_name(arc):
         return arc.from_node.name == interation_name
 
-    # Returns list of all neighbours_arcs
+    # Returns list of all neighbouring nodes based off arc destinations nodes
     neighbours_arcs = filter(get_name, network.arcs)
     current_node = network.get_node(interation_name)
 
+    # For each arc, calculate the distance as the sum of the arc weight and the distance to get to the origin of the arc
     for arc in neighbours_arcs:
         new_distance = arc.weight + current_node.value[0]
         neighbour = arc.to_node
+        # If the stored value is greater than the new distance calculated:
+        # Replace the distance with the shorter new distance
+        # Set the predecessor as the current node which distance is calculated from
         if neighbour.value[0] > new_distance:
             neighbour.value[0] = new_distance
             neighbour.value[1] = current_node
 
     return interation_name
-
 
 def spath_extract_path(network, destination_name):
     """
@@ -162,17 +169,22 @@ def spath_extract_path(network, destination_name):
     TODO
     """
 
+    # Set the current node to the destination
     current_node = network.get_node(destination_name)
 
+    # Get the predecessor of destination node
     predecessor_node = current_node.value[1]
 
     if predecessor_node is None:
         return [destination_name]
 
-    predecessor_name = current_node.value[1].name
+    # Get name attribute of the predecessor node
+    predecessor_name = predecessor_node.name
 
+    # Call recursively to work through the chain of nodes getting the name and storing in path
     path = spath_extract_path(network, predecessor_name)
 
+    # Insert the name of the destination at the end of the path list (Not covered by initial call)
     path.append(destination_name)
 
     return path
@@ -194,14 +206,23 @@ def spath_algorithm(network, source_name, destination_name):
     path list: List of node names in shortest path, inclusive of start and end, if no solution, return None
     TODO
     """
+
+    # Initialise Dijkstra Algorithm
     unvisited = spath_initialise(network, source_name)
 
+    # While there are still unvisitied nodes perform iterations of Dijkstra Algorithm
     while unvisited:
+
         spath_iteration(network, unvisited)
 
+    # Return unchecked list of node names in path
     path_unchecked = spath_extract_path(network, destination_name)
+
+    # Return unchecked distance as the first element of value attribute of the destination node of the path
     distance_unchecked = network.get_node(path_unchecked[-1]).value[0]
 
+    # If the unchecked distance is infinity, there is no path, therefore return None for path and distance
+    # Otherwise, unchecked values are accurate and return there as final path and distance
     if distance_unchecked == np.inf:
         path = None
         distance = None
@@ -209,7 +230,6 @@ def spath_algorithm(network, source_name, destination_name):
         path = path_unchecked
         distance = distance_unchecked
     return distance, path
-
 
 class Node(object):
     """
