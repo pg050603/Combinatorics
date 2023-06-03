@@ -36,14 +36,17 @@ for i in range(len(yj_iw1)):
 # From dict, get a list of years and a list of the cumulative net mass change corresponding to each year
 Year = list(cmc_tj_map.keys())
 Cumulative_mass_change = list(cmc_tj_map.values())
-
 # Create figure
 plt.figure(figsize=(5, 2.7), layout='constrained')
 # Plot the cumulative net mass change against year
 plt.plot(Year, Cumulative_mass_change, label='Cumulative Net Mass Change')
+# Plot the earthquakes onto chart
+earthquakes = [2003.5, 2004.5, 2005]
+for p in earthquakes:
+    plt.axvline(p,  label=f'Earthquake {p}', color='red')
 # Axis labels, title, and legend
 plt.xlabel('Year')
 plt.ylabel('Cumulative Net Mass Change (kg)')
 plt.title("Yearly Cumulative Net Mass Change (1980 - 2014.5)")
-
+plt.legend()
 plt.show()
